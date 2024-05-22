@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint
 
 home_routes=Blueprint('home_routes', __name__)
 
