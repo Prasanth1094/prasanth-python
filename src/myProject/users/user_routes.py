@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify, request, render_template
+from flask import Blueprint, jsonify, request, render_template, send_file
+import pandas as pd
 from src.myProject.users.user_db import (
     get_users,
     add_user,
@@ -17,7 +18,6 @@ def template():
 
 @user_routes.route("/users", methods=["GET", "POST"])
 def get_user():
-    print("get_user", request.method)
     if request.method == "GET":
         rows = get_users()
         data = []
@@ -70,3 +70,15 @@ def get_userbyid(id):
             return jsonify(error=str(e)), 400
     else:
         return jsonify({"message": "Method Not Allowed"}), 405
+
+
+@user_routes.route("/users/reports", methods=["GET"])
+def get_reports():
+    data = get_users()
+    column_names = ["Id", "Name", "Email", "Age"]
+    df = pd.DataFrame(data, columns=column_names)
+    df.index = df.index + 1
+    df.insert(0, "Serio.No", df.index)
+    report_file_path = "report.csv"
+    df.to_csv(report_file_path, index=False)
+    return send_file(report_file_path, as_attachment=True)

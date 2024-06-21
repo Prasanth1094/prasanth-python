@@ -1,3 +1,4 @@
+import os
 import psycopg2
 from contextlib import contextmanager
 from psycopg2.extras import DictCursor
@@ -26,7 +27,10 @@ def connect():
     conn = None
     try:
         conn = psycopg2.connect(
-            "dbname='prasanth_db' user='postgres' host='localhost' password='prasanth'"
+            dbname=os.getenv('DB_NAME'),
+            user=os.getenv('DB_USER'),
+            host=os.getenv('DB_HOST'),
+            password=os.getenv('DB_PASSWORD')
         )
         print("Connected to the PostgreSQL database...")
     except (Exception, psycopg2.DatabaseError) as error:

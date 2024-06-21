@@ -1,5 +1,7 @@
 
 from src.myProject.database.db import get_db_cursor
+import pandas as pd
+import matplotlib.pyplot as plt
 
 def get_users():
     rows=None
@@ -45,3 +47,9 @@ def delete_user(id):
     except Exception as e:
         print(e)
         raise   
+def get_users_reports():
+    data=get_users()
+    df = pd.DataFrame(data)
+    report = df.describe()
+    return report.to_csv('report.csv')
+    
