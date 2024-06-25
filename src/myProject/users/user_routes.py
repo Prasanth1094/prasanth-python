@@ -1,5 +1,9 @@
 from flask import Blueprint, jsonify, request, render_template, send_file
 import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+from docx import Document
+
 from src.myProject.users.user_db import (
     get_users,
     add_user,
@@ -82,3 +86,52 @@ def get_reports():
     report_file_path = "report.csv"
     df.to_csv(report_file_path, index=False)
     return send_file(report_file_path, as_attachment=True)
+
+@user_routes.route("/users/pdf", methods=["GET"])
+def get_reports_as_pdf():
+    data = get_users()
+    column_names = ["Id", "Name", "Email", "Age"]
+    df = pd.DataFrame(data, columns=column_names)
+    df.index = df.index + 1
+    df.insert(0, "Serio.No", df.index)
+    
+     # Create a plot
+    fig, ax =plt.subplots(figsize=(12,4))
+    ax.axis('tight')
+    ax.axis('off')
+    ax.table(cellText=df.values, colLabels=df.columns, cellLoc = 'center', loc='center')
+
+    # Save the plot as a PDF
+    pdf = PdfPages("report.pdf")
+    pdf.savefig(fig, bbox_inches='tight')
+    pdf.close()
+
+    return send_file("report.pdf", as_attachment=True)
+
+@user_routes.route("/users/docx", methods=["GET"])
+def get_reports_as_docx():
+    data = get_users()
+    column_names = ["Id", "Name", "Email", "Age"]
+    df = pd.DataFrame(data, columns=column_names)
+    df.index = df.index + 1
+    df.insert(0, "Serio.No", df.index)
+    
+     # Create a new Document
+    doc = Document()
+
+    # Add a table to the document
+    table = doc.add_table(df.shape[0]+1, df.shape[1])
+
+    # Add the headers
+    for j in range(df.shape[-1]):
+        table.cell(0,j).text = df.columns[j]
+
+    # Add the rest of the data frame
+    for i in range(df.shape[0]):
+        for j in range(df.shape[-1]):
+            table.cell(i+1,j).text = str(df.values[i,j])
+
+    # Save the doc
+    doc.save("report.docx")
+
+    return send_file("report.docx", as_attachment=True)
