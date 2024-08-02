@@ -1,0 +1,31 @@
+services:
+  web:
+    build: .
+    container_name: my_python_app
+    ports:
+      - "5000:5000"
+    environment: 
+      - "DB_HOST=db" 
+      - "DB_PORT=5432"
+      - "DB_NAME=prasanth_db"
+      - "DB_USER=postgres"
+      - "DB_PASS=prasanth"
+    entrypoint: ["sh", "-c", "python run.py"]
+    depends_on:
+      - db    
+
+  db:
+    image: postgres:13
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: prasanth
+      POSTGRES_DB: prasanth_db
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

@@ -5,6 +5,7 @@ from src.myProject.contact.contact_routes import contact_routes
 from src.myProject.users.user_routes import user_routes
 from src.myProject.files.file_routes import file_routes
 from src.myProject.email.email_routes import email_routes
+
 app = Flask(__name__)
 app.register_blueprint(home_routes)
 app.register_blueprint(about_routes)
@@ -14,4 +15,4 @@ app.register_blueprint(file_routes)
 app.register_blueprint(email_routes)
 
 if __name__ == "__main__":
-    app.run(port=5000,debug='true')
+    app.run(host='0.0.0.0', port=5000, debug=True)
